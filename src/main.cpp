@@ -2,7 +2,7 @@
 #include <vector>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
-
+#include <thread>         // std::thread
 
 #include "life.h"
 
@@ -48,6 +48,37 @@ int livingNeighbours(  const world& theWorld, int col, int row  )
             alive++;
     return alive;
 }
+/// Calculate next generation for one cell
+void NextGeneration( world& next, const world& theWorld, int col, int row )
+{
+    /*
+    - Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
+    - Any live cell with two or three live neighbours lives on to the next generation.
+    - Any live cell with more than three live neighbours dies, as if by overpopulation.
+    - Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+    */
+
+    int nalive = livingNeighbours( theWorld, col, row );
+    if( theWorld.isAlive( col, row ) )
+    {
+        switch( nalive )
+        {
+        case 2:
+        case 3:
+            next.born( col, row );
+            break;
+        case 4:
+            next.die( col, row );
+        }
+    }
+    else
+    {
+        if( nalive == 3 )
+            next.born( col, row );
+    }
+}
+
+/// Calculate next generation for entire wolrd
 void NextGeneration( world& theWorld )
 {
     // next generation
@@ -58,31 +89,7 @@ void NextGeneration( world& theWorld )
     int col = 0;
     for( int c = 0; c < (int) theWorld.grid.size(); c++ )
     {
-        /*
-        - Any live cell with fewer than two live neighbours dies, as if caused by underpopulation.
-        - Any live cell with two or three live neighbours lives on to the next generation.
-        - Any live cell with more than three live neighbours dies, as if by overpopulation.
-        - Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-        */
-
-        int nalive = livingNeighbours( theWorld, col, row );
-        if( theWorld.isAlive( col, row ) )
-        {
-            switch( nalive )
-            {
-            case 2:
-            case 3:
-                next.born( col, row );
-                break;
-            case 4:
-                next.die( col, row );
-            }
-        }
-        else
-        {
-            if( nalive == 3 )
-                next.born( col, row );
-        }
+        NextGeneration( next, theWorld, col, row );
 
         col += 1;
         if( col == theWorld.ncols )
@@ -96,11 +103,50 @@ void NextGeneration( world& theWorld )
     theWorld = next;
 }
 
+void NextGenerationSubset( world& next, world& theWorld, int first, int last )
+{
+    // loop over cells in grid subset assigned
+    int row = first % theWorld.nrows;
+    int col = first / theWorld.nrows;
+    for( int c = 0; c < last - first + 1; c++ )
+    {
+        NextGeneration( next, theWorld, col, row );
+
+        col += 1;
+        if( col == theWorld.ncols )
+        {
+            row += 1;
+            col = 0;
+        }
+    }
+}
+
+void NextGenerationParrallel( world& theWorld )
+{
+    // next generation
+    world next( theWorld.ncols, theWorld.nrows );
+
+    int first = 0;
+    int last = theWorld.ncols * theWorld.nrows / 2;
+    thread a (NextGenerationSubset,std::ref(next),std::ref(theWorld),first,last);
+    first = theWorld.ncols * theWorld.nrows - last;
+    last = theWorld.ncols * theWorld.nrows - 1 ;
+    thread b (NextGenerationSubset,std::ref(next),std::ref(theWorld),first,last);
+    a.join();
+    b.join();
+
+    // next generation replaces previous
+    theWorld = next;
+}
+
+
 
 int main()
 {
     void test();
     test();
+    void testParrallel();
+    testParrallel();
 
     world theWorld( 5, 5 );
     initRandom( theWorld, 10  );

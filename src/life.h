@@ -39,3 +39,4 @@ public:
 };
 
 void NextGeneration( world& theWorld );
+void NextGenerationParrallel( world& theWorld );
