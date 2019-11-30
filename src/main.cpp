@@ -3,47 +3,11 @@
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 
+
+#include "life.h"
+
 using namespace std;
 
-class world
-{
-public:
-    int ncols;
-    int nrows;
-    vector< bool > grid;
-    world( int c, int r )
-        : ncols( c )
-        , nrows( r )
-        , grid( c * r )
-    {
-
-    }
-    bool isAlive( int col, int row ) const
-    {
-        return grid[col + ncols*row ] == true;
-    }
-    void born( int col, int row )
-    {
-        grid[ col + ncols * row ] = true;
-    }
-    void die( int col, int row )
-    {
-        grid[ col + ncols * row ] = false;
-    }
-    int aliveCount()
-    {
-        int count = 0;
-        for( auto c : grid )
-            if( c )
-                count++;
-        return count;
-    }
-    void clear()
-    {
-        grid.clear();
-        grid.resize( ncols * nrows );
-    }
-};
 
 void initRandom( world& theWorld, int nalive )
 {
@@ -132,55 +96,10 @@ void NextGeneration( world& theWorld )
     theWorld = next;
 }
 
-void test()
-{
-    world theWorld( 5, 5 );
-    theWorld.born( 2, 2 );
-    if( theWorld.aliveCount() != 1 )
-    {
-        std::cout << "failed 1\n";
-        exit(1);
-    }
-    NextGeneration( theWorld );
-    if( theWorld.aliveCount() != 0 )
-    {
-        std::cout << "failed 2\n";
-        exit(1);
-    }
-    theWorld.clear();
-    theWorld.born( 2, 2 );
-    theWorld.born( 2, 3 );
-        if( theWorld.aliveCount() != 2 )
-    {
-        std::cout << "failed 3\n";
-        exit(1);
-    }
-    NextGeneration( theWorld );
-    if( theWorld.aliveCount() != 0 )
-    {
-        std::cout << "failed 4\n";
-        exit(1);
-    }
-    theWorld.clear();
-    theWorld.born( 2, 2 );
-    theWorld.born( 2, 1 );
-    theWorld.born( 2, 3 );
-        if( theWorld.aliveCount() != 3 )
-    {
-        std::cout << "failed 5\n";
-        exit(1);
-    }
-    NextGeneration( theWorld );
-    if( theWorld.aliveCount() != 1 )
-    {
-        std::cout << "failed 6\n";
-        exit(1);
-    }
-    cout << "all test passed\n";
-}
 
 int main()
 {
+    void test();
     test();
 
     world theWorld( 5, 5 );
