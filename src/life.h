@@ -36,6 +36,15 @@ public:
         grid.clear();
         grid.resize( ncols * nrows );
     }
+    void increment( int& col, int& row )
+    {
+        col += 1;
+        if( col == ncols )
+        {
+            row += 1;
+            col = 0;
+        }
+    }
 };
 
 void NextGeneration( world& theWorld );

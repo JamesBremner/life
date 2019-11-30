@@ -161,8 +161,14 @@ void gridSize( int size )
 
     world theWorld( size, size );
     initRandom( theWorld, size * size / 4  );
+
+    void visualizer( world& theWorld);
+    visualizer( theWorld );
+
     for( int k = 0; k < 100; k++ )
         NextGeneration( theWorld );
+
+    visualizer( theWorld );
 }
 
 int main( int argc, char* argv[] )
