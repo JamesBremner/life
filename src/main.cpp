@@ -139,7 +139,21 @@ void NextGenerationParrallel( world& theWorld )
     theWorld = next;
 }
 
+void SingleThread()
+{
+    world theWorld( 500, 500 );
+    initRandom( theWorld, 10000  );
+    for( int k = 0; k < 100; k++ )
+        NextGeneration( theWorld );
+}
 
+void MultiThread()
+{
+    world theWorld( 500, 500 );
+    initRandom( theWorld, 10000  );
+    for( int k = 0; k < 100; k++ )
+        NextGenerationParrallel( theWorld );
+}
 
 int main()
 {
@@ -148,9 +162,7 @@ int main()
     void testParrallel();
     testParrallel();
 
-    world theWorld( 5, 5 );
-    initRandom( theWorld, 10  );
-    NextGeneration( theWorld );
-    cout << "Hello world!" << endl;
+    SingleThread();
+
     return 0;
 }
