@@ -155,14 +155,25 @@ void MultiThread()
         NextGenerationParrallel( theWorld );
 }
 
-int main()
+void gridSize( int size )
+{
+    cout << "grid " << size << " by " << size << "\n";
+
+    world theWorld( size, size );
+    initRandom( theWorld, size * size / 4  );
+    for( int k = 0; k < 100; k++ )
+        NextGeneration( theWorld );
+}
+
+int main( int argc, char* argv[] )
 {
     void test();
     test();
+
     void testParrallel();
     testParrallel();
 
-    SingleThread();
+    gridSize( atoi( argv[1] ) );
 
     return 0;
 }
