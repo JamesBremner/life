@@ -26,29 +26,7 @@ void initRandom( world& theWorld, int nalive )
         }
     }
 }
-int livingNeighbours(  const world& theWorld, int col, int row  )
-{
-    int alive = 0;
-    for( int c = col-1; c <=col+1; c++ )
-    {
-        if( c < 0 )
-            continue;
-        if( c >= theWorld.ncols )
-            continue;
-        for( int r = row-1; r <= row+1; r++ )
-        {
-            if( r < 0 )
-                continue;
-            if( r >= theWorld.nrows )
-                continue;
-            if( c == col && r == row )
-                continue;
-            if( theWorld.isAlive( c, r ) )
-                alive++;
-        }
-    }
-    return alive;
-}
+
 /// Calculate next generation for one cell
 void NextGeneration( world& next, const world& theWorld, int col, int row )
 {
@@ -70,6 +48,7 @@ void NextGeneration( world& next, const world& theWorld, int col, int row )
             break;
         case 4:
             next.die( col, row );
+            break;
         }
     }
     else
@@ -183,7 +162,7 @@ void gridSize( int size )
 
     // start visualizer running in its own thread
     void visualizer( world& theWorld, int refreshRateMsecs );
-    thread v ( visualizer, ref(theWorld), 1000 );
+    thread v ( visualizer, ref(theWorld), 500 );
 
     // start evolution
     while( 1 )

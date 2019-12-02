@@ -22,10 +22,15 @@ public:
     }
     bool isAlive( int col, int row ) const
     {
+        if( 0 > col || col >= ncols )
+            return false;
+        if( 0 > row || row >= nrows )
+            return false;
         return grid[col + ncols*row ] == true;
     }
     void born( int col, int row )
     {
+        //std::cout << "born " << row <<" "<<col << "\n";
         grid[ col + ncols * row ] = true;
     }
     void die( int col, int row )
@@ -62,6 +67,9 @@ public:
         newWorld = *this;
     }
 };
+
+/// Number of living cells in eight ( orthogonal and diagonal ) neighbours
+int livingNeighbours(  const world& theWorld, int col, int row  );
 
 void NextGeneration( world& theWorld );
 void NextGenerationParrallel( world& theWorld );

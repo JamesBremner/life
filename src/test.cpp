@@ -63,8 +63,8 @@ void test()
         makeGlider( theWorld, 5, 5 );
         if( theWorld.aliveCount() != 5 )
             throw 14;
-        for( int k = 0; k < 5; k++ ) {
-        NextGeneration( theWorld );
+        for( int k = 0; k < 1; k++ ) {
+            NextGeneration( theWorld );
         if( theWorld.aliveCount() != 5 )
             throw 15;
         }
