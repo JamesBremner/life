@@ -1,13 +1,22 @@
+#include <mutex>
+
 class world
 {
 public:
     int ncols;
     int nrows;
     std::vector< bool > grid;
+    int generation;
+
     world( int c, int r )
         : ncols( c )
         , nrows( r )
         , grid( c * r )
+        , generation( 0 )
+    {
+    }
+    world()
+    : world( 1, 1 )
     {
 
     }
@@ -36,6 +45,7 @@ public:
         grid.clear();
         grid.resize( ncols * nrows );
     }
+    /// Next column and row in grid
     void increment( int& col, int& row )
     {
         col += 1;
@@ -44,6 +54,12 @@ public:
             row += 1;
             col = 0;
         }
+    }
+    void ThreadSafeCopy( world& newWorld )
+    {
+        static std::mutex M;
+        std::lock_guard<std::mutex> lck ( M );
+        newWorld = *this;
     }
 };
 

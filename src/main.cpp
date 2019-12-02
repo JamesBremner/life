@@ -29,23 +29,24 @@ void initRandom( world& theWorld, int nalive )
 int livingNeighbours(  const world& theWorld, int col, int row  )
 {
     int alive = 0;
-    col -= 1;
-    if( col >= 0 )
-        if( theWorld.isAlive( col, row ) )
-            alive++;
-    col += 2;
-    if( col < theWorld.ncols )
-        if( theWorld.isAlive( col, row ) )
-            alive++;
-    col -= 1;
-    row -= 1;
-    if( row >= 0 )
-        if( theWorld.isAlive( col, row ) )
-            alive++;
-    row += 2;
-    if( row < theWorld.nrows )
-        if( theWorld.isAlive( col, row ) )
-            alive++;
+    for( int c = col-1; c <=col+1; c++ )
+    {
+        if( c < 0 )
+            continue;
+        if( c >= theWorld.ncols )
+            continue;
+        for( int r = row-1; r <= row+1; r++ )
+        {
+            if( r < 0 )
+                continue;
+            if( r >= theWorld.nrows )
+                continue;
+            if( c == col && r == row )
+                continue;
+            if( theWorld.isAlive( c, r ) )
+                alive++;
+        }
+    }
     return alive;
 }
 /// Calculate next generation for one cell
@@ -83,6 +84,7 @@ void NextGeneration( world& theWorld )
 {
     // next generation
     world next( theWorld.ncols, theWorld.nrows );
+    next.generation = theWorld.generation + 1;
 
     // loop over cells in grid
     int row = 0;
@@ -101,6 +103,10 @@ void NextGeneration( world& theWorld )
 
     // next generation replaces previous
     theWorld = next;
+
+    //cout << "NextGeneration alive count " << next.aliveCount() << "\n";
+
+
 }
 
 void NextGenerationSubset( world& next, world& theWorld, int first, int last )
@@ -155,21 +161,39 @@ void MultiThread()
         NextGenerationParrallel( theWorld );
 }
 
+
+void makeGlider( world& theWorld, int col, int row)
+{
+    theWorld.born( col-1, row+1 );
+    theWorld.born( col, row+1 );
+    theWorld.born( col+1, row+1 );
+    theWorld.born( col+1, row );
+    theWorld.born( col, row-1 );
+
+
+}
+
 void gridSize( int size )
 {
     cout << "grid " << size << " by " << size << "\n";
 
+    // initialize with 25% living cells
     world theWorld( size, size );
     initRandom( theWorld, size * size / 4  );
 
-    void visualizer( world& theWorld);
-    visualizer( theWorld );
+    // start visualizer running in its own thread
+    void visualizer( world& theWorld, int refreshRateMsecs );
+    thread v ( visualizer, ref(theWorld), 1000 );
 
-    for( int k = 0; k < 100; k++ )
+    // start evolution
+    while( 1 )
+    {
         NextGeneration( theWorld );
+    }
 
-    visualizer( theWorld );
+
 }
+
 
 int main( int argc, char* argv[] )
 {
